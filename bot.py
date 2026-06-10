@@ -746,4 +746,84 @@ async def rekapkata(update: Update, context: ContextTypes.DEFAULT_TYPE):
             uid = d["user_id"]
 
             if uid not in hasil_user:
-                hasil_use
+                hasil_user[uid] = {
+                    "name": d.get("name", "Unknown"),
+                    "count": 0
+                }
+
+            hasil_user[uid]["count"] += 1
+
+    hasil = (
+        f"📊 JUMLAH PESAN HARI INI\n"
+        f"📅 {now.strftime('%d-%m-%Y')}\n\n"
+        f"📝 PESAN DICARI: {', '.join(kata_list)}\n\n"
+    )
+
+    if not hasil_user:
+        hasil += "TIDAK ADA DATA"
+    else:
+        no = 1
+
+        sorted_users = sorted(
+            hasil_user.items(),
+            key=lambda x: x[1]["count"],
+            reverse=True
+        )
+
+        for uid, user in sorted_users:
+            hasil += (
+                f"{no}. {user['name']}\n"
+                f"🆔 {uid}\n"
+                f"📨 {user['count']} pesan\n\n"
+            )
+            no += 1
+
+    await msg.reply_text(hasil)
+
+#================= MAIN =================
+app = ApplicationBuilder().token(TOKEN).build()
+
+# COMMAND
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("help", help_cmd))
+app.add_handler(CommandHandler("infobot", infobot))
+app.add_handler(CommandHandler("rekapkata", rekapkata))
+
+# target
+app.add_handler(CommandHandler("add", add))
+app.add_handler(CommandHandler("delete", delete))
+app.add_handler(CommandHandler("listusn", listusn))
+
+# user
+app.add_handler(CommandHandler("adduser", adduser))
+app.add_handler(CommandHandler("deluser", deluser))
+app.add_handler(CommandHandler("listuser", listuser))
+
+# text
+app.add_handler(CommandHandler("addtext", addtext))
+app.add_handler(CommandHandler("deltext", deltext))
+app.add_handler(CommandHandler("alltext", alltext))
+
+# filter
+app.add_handler(CommandHandler("filtertext", filtertext))
+app.add_handler(CommandHandler("filterfoto", filterfoto))
+app.add_handler(CommandHandler("deletepesan", deletepesan))
+
+# premium
+app.add_handler(CommandHandler("masaaktif", masaaktif))
+app.add_handler(CommandHandler("cekmasaaktif", cekmasaaktif))
+app.add_handler(CommandHandler("listpremium", listpremium))
+app.add_handler(CommandHandler("tambahmasaaktif", tambahmasaaktif))
+app.add_handler(CommandHandler("kurangmasaaktif", kurangmasaaktif))
+
+# 🔥 AUTO DELETE PALING BAWAH
+app.add_handler(MessageHandler(~filters.COMMAND, auto_delete), group=1)
+
+print("BOT RUNNING...")
+
+async def error_handler(update, context):
+    import traceback
+    print("ERROR NIH:")
+    traceback.print_exception(type(context.error), context.error, context.error.__traceback__)
+# 🔥 FIX 409 + RUN
+app.run_polling(drop_pending_updates=True)
