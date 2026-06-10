@@ -31,7 +31,6 @@ OWNER_USERNAME = "@KINGZAAASLI"
 client = MongoClient(MONGO_URI)
 db = client["telegram_bot"]
 groups_col = db["groups"]
-chat_logs = db["chat_logs"]
 #================= RESPONSE =================
 
 RESP = {
