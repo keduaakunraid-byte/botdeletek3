@@ -809,3 +809,20 @@ app.add_handler(CommandHandler("kurangmasaaktif", kurangmasaaktif))
 app.add_handler(MessageHandler(~filters.COMMAND, auto_delete), group=1)
 
 print("BOT RUNNING...")
+
+async def error_handler(update, context):
+    import traceback
+    print("ERROR NIH:")
+    traceback.print_exception(
+        type(context.error),
+        context.error,
+        context.error.__traceback__
+    )
+
+app.add_error_handler(error_handler)
+
+print("BOT RUNNING...")
+
+app.run_polling(
+    drop_pending_updates=True
+)
