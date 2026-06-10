@@ -280,17 +280,6 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await msg.reply_text(text)
 
-async def sewabot(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("📆 Mingguan", callback_data="sewa_mingguan")],
-        [InlineKeyboardButton("📅 Bulanan", callback_data="sewa_bulanan")]
-    ]
-
-    await update.message.reply_text(
-        "💎 PILIH PAKET SEWA:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
 #================= TARGET =================
 
 async def add(update, context):
@@ -820,10 +809,3 @@ app.add_handler(CommandHandler("kurangmasaaktif", kurangmasaaktif))
 app.add_handler(MessageHandler(~filters.COMMAND, auto_delete), group=1)
 
 print("BOT RUNNING...")
-
-async def error_handler(update, context):
-    import traceback
-    print("ERROR NIH:")
-    traceback.print_exception(type(context.error), context.error, context.error.__traceback__)
-# 🔥 FIX 409 + RUN
-app.run_polling(drop_pending_updates=True)
