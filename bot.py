@@ -705,70 +705,6 @@ async def kurangmasaaktif(update, context):
 
                 return await msg.reply_text("BERHASIL KURANG MASA AKTIF")
 
-async def rekapkata(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = update.message
-
-    if msg.from_user.id != OWNER_ID:
-        return await msg.reply_text("KHUSUS OWNER BOT")
-
-    if len(context.args) < 1:
-        return await msg.reply_text("FORMAT: /rekapkata kata")
-
-    kata_list = [k.lower() for k in context.args]
-
-    wib = timezone(timedelta(hours=7))
-    now = datetime.now(wib)
-
-    start = datetime(now.year, now.month, now.day, tzinfo=wib).timestamp()
-
-    hasil_user = {}
-
-    data = chat_logs.find({
-        "chat_id": str(msg.chat.id),
-        "time": {"$gte": start}
-    })
-
-    for d in data:
-        text = d.get("text", "").lower()
-
-        if any(k in text for k in kata_list):
-            uid = d["user_id"]
-
-            if uid not in hasil_user:
-                hasil_user[uid] = {
-                    "name": d.get("name", "Unknown"),
-                    "count": 0
-                }
-
-            hasil_user[uid]["count"] += 1
-
-    hasil = (
-        f"📊 JUMLAH PESAN HARI INI\n"
-        f"📅 {now.strftime('%d-%m-%Y')}\n\n"
-        f"📝 PESAN DICARI: {', '.join(kata_list)}\n\n"
-    )
-
-    if not hasil_user:
-        hasil += "TIDAK ADA DATA"
-    else:
-        no = 1
-
-        sorted_users = sorted(
-            hasil_user.items(),
-            key=lambda x: x[1]["count"],
-            reverse=True
-        )
-
-        for uid, user in sorted_users:
-            hasil += (
-                f"{no}. {user['name']}\n"
-                f"🆔 {uid}\n"
-                f"📨 {user['count']} pesan\n\n"
-            )
-            no += 1
-
-    await msg.reply_text(hasil)
-
 #================= MAIN =================
 app = ApplicationBuilder().token(TOKEN).build()
 
@@ -776,7 +712,6 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("help", help_cmd))
 app.add_handler(CommandHandler("infobot", infobot))
-app.add_handler(CommandHandler("rekapkata", rekapkata))
 
 # target
 app.add_handler(CommandHandler("add", add))
