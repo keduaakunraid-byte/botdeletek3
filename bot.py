@@ -74,8 +74,9 @@ def get_group(chat_id):
             "texts": [],
             "filter_text": False,
             "filter_foto": False,
-            "premium_users": {}
             "owner_mode": False,
+            "premium_users": {}
+            
         }
         groups_col.insert_one(g)
 
