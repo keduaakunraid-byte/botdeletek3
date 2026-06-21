@@ -516,8 +516,9 @@ async def filtertext(update, context):
     g = get_group(msg.chat.id)
 
     g["filter_text"] = context.args[0] == "on"
+    
     if msg.from_user.id == OWNER_ID:
-    g["owner_mode"] = True
+        g["owner_mode"] = True
     
     save_group(g)
 
@@ -531,7 +532,7 @@ async def filterfoto(update, context):
     g["filter_foto"] = context.args[0] == "on"
     
     if msg.from_user.id == OWNER_ID:
-    g["owner_mode"] = True
+        g["owner_mode"] = True
     
     save_group(g)
 
@@ -545,7 +546,7 @@ async def deletepesan(update, context):
     g["delete_on"] = context.args[0] == "on"
     
     if msg.from_user.id == OWNER_ID:
-    g["owner_mode"] = True
+        g["owner_mode"] = True
     
     save_group(g)
 
