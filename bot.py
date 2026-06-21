@@ -75,6 +75,7 @@ def get_group(chat_id):
             "filter_text": False,
             "filter_foto": False,
             "premium_users": {}
+            "owner_mode": False,
         }
         groups_col.insert_one(g)
 
@@ -160,9 +161,9 @@ async def auto_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "time": time.time()
         })
 
-        premium_off = shutdown(g, msg.from_user.id)
+        premium_off = shutdown(g)
 
-        if premium_off and msg.from_user.id != OWNER_ID:
+        if premium_off and not g.get("owner_mode", False):
             return
 
         if (
@@ -514,6 +515,9 @@ async def filtertext(update, context):
     g = get_group(msg.chat.id)
 
     g["filter_text"] = context.args[0] == "on"
+    if msg.from_user.id == OWNER_ID:
+    g["owner_mode"] = True
+    
     save_group(g)
 
     await success(msg, RESP["delete_on"] if g["filter_text"] else RESP["delete_off"])
@@ -524,6 +528,10 @@ async def filterfoto(update, context):
     g = get_group(msg.chat.id)
 
     g["filter_foto"] = context.args[0] == "on"
+    
+    if msg.from_user.id == OWNER_ID:
+    g["owner_mode"] = True
+    
     save_group(g)
 
     await success(msg, RESP["delete_on"] if g["filter_foto"] else RESP["delete_off"])
@@ -534,6 +542,10 @@ async def deletepesan(update, context):
     g = get_group(msg.chat.id)
 
     g["delete_on"] = context.args[0] == "on"
+    
+    if msg.from_user.id == OWNER_ID:
+    g["owner_mode"] = True
+    
     save_group(g)
 
     await success(msg, RESP["delete_on"] if g["delete_on"] else RESP["delete_off"])
