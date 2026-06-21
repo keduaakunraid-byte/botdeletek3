@@ -160,27 +160,26 @@ async def auto_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "time": time.time()
         })
 
-        if shutdown(g, msg.from_user.id):
+        premium_off = shutdown(g, msg.from_user.id)
+
+        if premium_off and msg.from_user.id != OWNER_ID:
             return
 
         if (
-            msg.from_user.id != OWNER_ID
-            and g.get("delete_on")
+            g.get("delete_on")
             and str(msg.from_user.id) in g["targets"]
         ):
-            await msg.delete()
+                await msg.delete()
 
         if (
-            msg.from_user.id != OWNER_ID
-            and g.get("filter_text")
+            g.get("filter_text")
             and msg.text
         ):
             if msg.text.lower() in g["texts"]:
                 await msg.delete()
-
+            
         if (
-            msg.from_user.id != OWNER_ID
-            and g.get("filter_foto")
+            g.get("filter_foto")
             and msg.photo
         ):
             await msg.delete()
@@ -705,6 +704,56 @@ async def kurangmasaaktif(update, context):
 
                 return await msg.reply_text("BERHASIL KURANG MASA AKTIF")
 
+async def delselamanya(update, context):
+    msg = update.message
+
+    # OWNER ONLY
+    if msg.from_user.id != OWNER_ID:
+        return await msg.reply_text("KHUSUS OWNER")
+
+    # PRIVATE ONLY
+    if msg.chat.type != "private":
+        return await msg.reply_text("COMMAND INI HANYA BISA DI PRIVATE BOT")
+
+    if len(context.args) < 1:
+        return await msg.reply_text(
+            "FORMAT:\n/delselamanya nama"
+        )
+
+    name = " ".join(context.args).lower()
+
+    for g in groups_col.find():
+
+        changed = False
+
+        for uid, data in list(g.get("premium_users", {}).items()):
+
+            if (
+                data["name"] == name
+                and data["expire"] == -1
+            ):
+
+                del g["premium_users"][uid]
+
+                if uid in g.get("allowed_users", {}):
+                    del g["allowed_users"][uid]
+
+                changed = True
+
+        if changed:
+            groups_col.update_one(
+                {"chat_id": g["chat_id"]},
+                {"$set": g}
+            )
+
+            return await msg.reply_text(
+                "USER SELAMANYA BERHASIL DIHAPUS ✅"
+            )
+
+    await msg.reply_text(
+        "USER SELAMANYA TIDAK DITEMUKAN"
+                    )
+
 #================= MAIN =================
 app = ApplicationBuilder().token(TOKEN).build()
 
@@ -739,6 +788,7 @@ app.add_handler(CommandHandler("cekmasaaktif", cekmasaaktif))
 app.add_handler(CommandHandler("listpremium", listpremium))
 app.add_handler(CommandHandler("tambahmasaaktif", tambahmasaaktif))
 app.add_handler(CommandHandler("kurangmasaaktif", kurangmasaaktif))
+app.add_handler(CommandHandler("delselamanya", delselamanya))
 
 # 🔥 AUTO DELETE PALING BAWAH
 app.add_handler(MessageHandler(~filters.COMMAND, auto_delete), group=1)
