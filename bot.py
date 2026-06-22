@@ -135,6 +135,8 @@ def is_allowed(uid, g):
     return uid == OWNER_ID or str(uid) in g.get("allowed_users", {})
 
 #================= REJECT =================
+async def owner_only(msg):
+    await msg.reply_text("KHUSUS OWNER")
 
 async def reject(msg):
     await msg.reply_text(f"𝗠𝗜𝗡𝗧𝗔 𝗜𝗭𝗜𝗡 𝗦𝗔𝗠𝗔 {OWNER_USERNAME}")
@@ -358,6 +360,9 @@ async def listusn(update, context):
 
 async def adduser(update, context):
     msg = update.message
+    if msg.from_user.id != OWNER_ID:
+        return await owner_only(msg)
+        
     g = get_group(msg.chat.id)
 
     if not is_allowed(msg.from_user.id, g):
@@ -380,6 +385,9 @@ async def adduser(update, context):
 
 async def deluser(update, context):
     msg = update.message
+    
+    if msg.from_user.id != OWNER_ID:
+        return await owner_only(msg)
 
     # PRIVATE MODE
     if msg.chat.type == "private":
@@ -556,6 +564,8 @@ async def deletepesan(update, context):
 #================= PREMIUM =================
 async def masaaktif(update, context):
     msg = update.message
+    if msg.from_user.id != OWNER_ID:
+        return await owner_only(msg)
 
     if len(context.args) < 4:
         return await msg.reply_text(
@@ -625,6 +635,8 @@ async def cekmasaaktif(update, context):
 
 async def listpremium(update, context):
     msg = update.message
+    if msg.from_user.id != OWNER_ID:
+        return await owner_only(msg)
 
     text = "𝐋𝐈𝐒𝐓 𝐏𝐑𝐄𝐌𝐈𝐔𝐌:\n\n"
     i = 1
@@ -657,6 +669,8 @@ async def listpremium(update, context):
 
 async def tambahmasaaktif(update, context):
     msg = update.message
+    if msg.from_user.id != OWNER_ID:
+        return await owner_only(msg)
 
     if msg.chat.type != "private":
         return await msg.reply_text("COMMAND INI HANYA BISA DI PRIVATE BOT")
@@ -687,6 +701,8 @@ async def tambahmasaaktif(update, context):
 
 async def kurangmasaaktif(update, context):
     msg = update.message
+    if msg.from_user.id != OWNER_ID:
+        return await owner_only(msg)
 
     if msg.chat.type != "private":
         return await msg.reply_text("COMMAND INI HANYA BISA DI PRIVATE BOT")
